@@ -29,10 +29,8 @@ namespace Turing
             //1 01 011 011 01
             Dictionary<string, List<State>> mach = new Dictionary<string, List<State>>();
             string key = "", end = "", replace = "", read = "", move = "";
-            //bool key_flag , terminal_flga = false;
-            //key_flag = true;
             string finish = "";
-            for (int i = 0; i < input.Length; i++)
+            for (int i = 0; i < input.Length; i++)//creating turing machine
             {
                 try
                 {
@@ -41,11 +39,6 @@ namespace Turing
                         key = key + input[i];
                     }
                     i++;
-                    //for (; input[i] != '0'; i++)
-                    //{
-                    //    start = start + input[i];
-                    //}
-                    //i++;
                     for (; input[i] != '0'; i++)
                     {
                         read = read + input[i];
@@ -67,11 +60,7 @@ namespace Turing
                     }
                     i++;
                 }
-                catch (IndexOutOfRangeException)
-                {
-
-                }
-                
+                catch (IndexOutOfRangeException){}
                 if (mach.ContainsKey(key))
                 {
                     State sTemp = new State(end, key, replace, read, move);
@@ -86,7 +75,6 @@ namespace Turing
                     mach.Add(key, temp);
                 }
                 if (!mach.ContainsKey(end))
-                
                 {
                     if (input.Length  == i)
                     {
@@ -101,7 +89,7 @@ namespace Turing
             tape.Clear();
             tape.Add("1");
             tape.Add("1");
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < count; i++)//inserting data in tape
             {
                 string str = Console.ReadLine();
                 
@@ -119,6 +107,10 @@ namespace Turing
                     
                     tape.Insert(1, temp);
                 }
+                if (str.Length == 0)
+                {
+                    tape.Insert(1, "1");
+                }
                 tape.Reverse();
                 Automata(mach, tape, finish);
                 tape.Clear();
@@ -126,76 +118,66 @@ namespace Turing
                 tape.Add("1");
             }
         }
-        static bool Automata(Dictionary<string, List<State>> mach, List<string> tape, string end)
+        static bool Automata(Dictionary<string, List<State>> mach, List<string> tape, string end)//accept string or not
         {
             int index = 1;// point to tape
             string state = "1";
             while (true)
             {
                 bool flag = false;
-                try
+                
+                for (int j = 0; j < mach[state].Count; j++)
                 {
-                    for (int j = 0; j < mach[state].Count; j++)
+                    if (mach[state][j].read == tape[index])
                     {
-                        if (mach[state][j].read == tape[index])
+                        tape[index] = mach[state][j].replace;
+                        if (mach[state][j].move == "1")
                         {
-                            tape[index] = mach[state][j].replace;
-                            if (mach[state][j].move == "1")
-                            {
-                                index--;
-                                if (index < 0)
-                                {
-                                    index++;
-                                    tape.Insert(0, "1");
-                                }
-                                
-                            }
-                            else
+                            index--;
+                            if (index < 0)
                             {
                                 index++;
-                                if (index >= tape.Count)
-                                {
-                                    tape.Add("1");
-                                }
+                                tape.Insert(0, "1");
                             }
-                            state = mach[state][j].end;
-                            flag = true;
-                            if (state == end)
-                            {
-                                Console.WriteLine("Accepted");
-                                return true;
-                            }
-                            break;
+                                
                         }
+                        else
+                        {
+                            index++;
+                            if (index >= tape.Count)
+                            {
+                                tape.Add("1");
+                            }
+                        }
+                        state = mach[state][j].end;
+                        flag = true;
                         if (state == end)
                         {
                             Console.WriteLine("Accepted");
                             return true;
                         }
-
+                        break;
                     }
-                    if (!flag)
+                    if (state.Length == mach.Count)
                     {
-                        Console.WriteLine("Rejected");
-                        return false;
+                        Console.WriteLine("Accepted");
+                        return true;
                     }
+
                 }
-                catch (ArgumentNullException)
+                if (state.Length == mach.Count)
+                {
+                    Console.WriteLine("Accepted");
+                    return true;
+                }
+                if (!flag)
                 {
                     Console.WriteLine("Rejected");
                     return false;
-                    throw;
                 }
-                
-            }
-            //if (state == end)
-            //{
-            //    Console.WriteLine("Accepted");
-            //    return true;
-            //}
-            //else
-            //    return false;
+            }      
         }
     }
-    
 }
+    
+
